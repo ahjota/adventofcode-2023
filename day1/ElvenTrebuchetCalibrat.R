@@ -17,15 +17,19 @@ extractCalibrationValueCandidates <- function(input) {
                                                   # this naive pattern doesn't work for the edge case
                                                   # oneight > "one" "eight"
                                                   # "[0-9]|one|two|three|four|five|six|seven|eight|nine"
+                                                  # so let's positive lookahead to make sure that we capture
+                                                  # every possible match
                                                   "(?=([0-9]|one|two|three|four|five|six|seven|eight|nine))"
                                                   )
   # this is a matrix where the second column has the capture group,
   # so let's clean this up a bit
   candidate_matches <- sapply(candidate_matches_raw, function(x) x[,2])
+  # and then go through and replace text-based digits with numeral-based digits
   sapply(candidate_matches, function(x) stringr::str_replace_all(x, digitSpellings))
 }
 
 recoverCalibrationValue <- function(input) {
+  # is this faster than paste0 %>% as.numeric?
   f <- function(x) x[1] * 10 + x[length(x)]
   
   # assume input is a character vector
