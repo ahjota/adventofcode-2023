@@ -13,8 +13,16 @@ digitSpellings <- c(
 )
 
 extractCalibrationValueCandidates <- function(input) {
-  candidates <- stringr::str_extract_all(input, "[0-9]|one|two|three|four|five|six|seven|eight|nine")
-  sapply(candidates, function(x) stringr::str_replace_all(x, digitSpellings))
+  candidate_matches_raw <- stringr::str_match_all(input,
+                                                  # this naive pattern doesn't work for the edge case
+                                                  # oneight > "one" "eight"
+                                                  # "[0-9]|one|two|three|four|five|six|seven|eight|nine"
+                                                  "(?=([0-9]|one|two|three|four|five|six|seven|eight|nine))"
+                                                  )
+  # this is a matrix where the second column has the capture group,
+  # so let's clean this up a bit
+  candidate_matches <- sapply(candidate_matches_raw, function(x) x[,2])
+  sapply(candidate_matches, function(x) stringr::str_replace_all(x, digitSpellings))
 }
 
 recoverCalibrationValue <- function(input) {
